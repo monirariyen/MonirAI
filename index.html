@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <title>বাংলা AI চ্যাটবট</title>
+    <style>
+        body { font-family: sans-serif; background: #f9f9f9; text-align: center; padding: 50px; }
+        textarea { width: 90%; height: 100px; }
+        #response { white-space: pre-wrap; margin-top: 20px; border: 1px solid #ccc; padding: 10px; background: #fff; }
+    </style>
+</head>
+<body>
+    <h1>বাংলা AI চ্যাটবট</h1>
+    <form id="chatForm">
+        <textarea name="message" placeholder="প্রশ্ন লিখুন..."></textarea><br>
+        <button type="submit">পাঠাও</button>
+    </form>
+    <div id="response"></div>
+
+    <script>
+        const form = document.getElementById('chatForm');
+        form.onsubmit = async (e) => {
+            e.preventDefault();
+            const formData = new FormData(form);
+            const response = await fetch('/chat', {
+                method: 'POST',
+                body: formData
+            });
+            const data = await response.json();
+            document.getElementById('response').innerText = "চ্যাটবট: " + data.reply;
+        };
+    </script>
+</body>
+</html>
