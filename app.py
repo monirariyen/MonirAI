@@ -1,32 +1,34 @@
-from flask import Flask, request, jsonify, send_from_directory
-import openai
 import os
+from flask import Flask, request, jsonify, render_template
+from openai import OpenAI
 
 app = Flask(__name__)
 
-# তোমার OpenAI API key এখানে বসাও
-openai.api_key = "তোমার-OpenAI-API-KEY"
+# OpenAI API Key
+openai_client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
 
-@app.route('/')
-def index():
-    return send_from_directory('.', 'index.html')
+@app.route("/")
+def home():
+    return render_template("index.html")
 
-@app.route('/ask', methods=['POST'])
-def ask():
-    data = request.json
-    user_msg = data.get("message", "")
-
+@app.route("/chat", methods=["POST"])
+def chat():
+    user_message = request.form["message"]
+    
     try:
-        response = openai.ChatCompletion.create(
+        response = openai_client.chat.completions.create(
             model="gpt-3.5-turbo",
-            messages=[{"role": "user", "content": user_msg}],
-            temperature=0.7
+            messages=[
+                {"role": "system", "content": "তুমি একজন সহায়ক বাংলা AI চ্যাটবট।"},
+                {"role": "user", "content": user_message}
+            ]
         )
-        reply = response.choices[0].message['content'].strip()
+
+        reply = response.choices[0].message.content.strip()
         return jsonify({"reply": reply})
     except Exception as e:
-        return jsonify({"reply": f"ভুল হয়েছে: {str(e)}"})
+        return jsonify({"reply": f"ভুল হয়েছে: {str(e)}"})
 
-if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 10000))
-    app.run(host='0.0.0.0', port=port)
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 10000))
+    app.run(debug=True, host="0.0.0.0", port=port)
