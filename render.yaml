@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: bangla-chatbot
+    env: python
+    buildCommand: ""
+    startCommand: python app.py

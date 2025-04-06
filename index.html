@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <title>বাংলা AI চ্যাটবট</title>
+  <style>
+    body { font-family: sans-serif; max-width: 600px; margin: auto; padding: 20px; }
+    .chatbox { border: 1px solid #ccc; padding: 10px; height: 300px; overflow-y: scroll; margin-bottom: 10px; }
+    .user { color: blue; }
+    .bot { color: green; }
+    input[type="text"] { width: 80%; padding: 10px; }
+    button { padding: 10px; }
+  </style>
+</head>
+<body>
+  <h2>বাংলা AI চ্যাটবট</h2>
+  <div class="chatbox" id="chatbox"></div>
+  <input type="text" id="userInput" placeholder="প্রশ্ন লিখুন..." />
+  <button onclick="sendMessage()">পাঠাও</button>
+
+  <script>
+    async function sendMessage() {
+      const input = document.getElementById("userInput");
+      const chatbox = document.getElementById("chatbox");
+      const userText = input.value;
+      if (!userText) return;
+
+      chatbox.innerHTML += `<div class="user"><strong>আপনি:</strong> ${userText}</div>`;
+      input.value = "";
+
+      const response = await fetch("/ask", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: userText })
+      });
+
+      const data = await response.json();
+      chatbox.innerHTML += `<div class="bot"><strong>চ্যাটবট:</strong> ${data.reply}</div>`;
+      chatbox.scrollTop = chatbox.scrollHeight;
+    }
+  </script>
+</body>
+</html>
